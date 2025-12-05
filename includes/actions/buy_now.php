@@ -12,20 +12,18 @@
 
   namespace Phoenix\Actions;
 
-  class add_product {
+  class buy_now {
 
     public static function execute() {
-      if (isset($_POST['products_id'])) {
-        $pid = (int)$_POST['products_id'];
-        $attributes = $_POST['id'] ?? null;
+      if (isset($_GET['products_id'])) {
+        $pid = (int)$_GET['products_id'];
 
-        $qty = empty($_POST['qty']) ? 1 : (int)$_POST['qty'];
+        if (\product_by_id::build($pid)->get('has_attributes')) {
+          \Href::redirect(\Guarantor::ensure_global('Linker')
+            ->build('product_info.php', ['products_id' => $pid]));
+        }
 
-        $_SESSION['cart']->add_cart(
-          $_POST['products_id'],
-          $_SESSION['cart']->get_quantity(\Product::build_uprid($pid, $attributes))+$qty,
-          $attributes);
-
+        $_SESSION['cart']->add_cart($pid, $_SESSION['cart']->get_quantity($pid)+1);
         $GLOBALS['messageStack']->add_session(
           'product_action',
           sprintf(PRODUCT_ADDED, \Product::fetch_name($pid)),

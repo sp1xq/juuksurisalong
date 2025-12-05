@@ -12,28 +12,24 @@
 
   namespace Phoenix\Actions;
 
-  class add_product {
+  class auto_delete {
 
     public static function execute() {
-      if (isset($_POST['products_id'])) {
-        $pid = (int)$_POST['products_id'];
-        $attributes = $_POST['id'] ?? null;
+      if (isset($_GET['products_id'])) {
+        $pid = (int)$_GET['products_id'];
 
-        $qty = empty($_POST['qty']) ? 1 : (int)$_POST['qty'];
+      $qty = empty($_GET['qty']) ? 1 : (int)$_GET['qty'];
 
         $_SESSION['cart']->add_cart(
-          $_POST['products_id'],
+          $_GET['products_id'],
           $_SESSION['cart']->get_quantity(\Product::build_uprid($pid, $attributes))+$qty,
           $attributes);
 
-        $GLOBALS['messageStack']->add_session(
-          'product_action',
-          sprintf(PRODUCT_ADDED, \Product::fetch_name($pid)),
-          'success');
+
       }
 
       \Href::redirect(\Guarantor::ensure_global('Linker')
-        ->build($GLOBALS['goto'])
+        ->build()
         ->retain_query_except($GLOBALS['parameters']));
     }
 
